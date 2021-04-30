@@ -23,4 +23,6 @@ public class GameEntity {
     public void addUser(GameUserEntity gameUserEntity) {
         users.add(gameUserEntity);
     }
+
+    //bajs
 }
