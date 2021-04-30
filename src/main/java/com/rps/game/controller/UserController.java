@@ -22,7 +22,6 @@ public class UserController {
     @PostMapping("/name")
     public User setName(@RequestBody SetName setName,
                         @RequestHeader(value = "token", required = true) String tokenId) throws UserNotFoundException {
-        //Token token = tokenService.getTokenById(tokenId);
         return toUser(userService.setName(setName, tokenId));
     }
 

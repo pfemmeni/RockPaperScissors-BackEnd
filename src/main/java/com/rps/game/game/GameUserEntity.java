@@ -5,19 +5,20 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Entity(name = "user_game")
+@Entity(name = "game_user")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserGameEntity {
+public class GameUserEntity {
 
-    @Id String id;
+    @Id
+    String id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

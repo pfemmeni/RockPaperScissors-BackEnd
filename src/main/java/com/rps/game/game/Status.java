@@ -2,7 +2,7 @@ package com.rps.game.game;
 
 
 public enum Status {
-    NONE,
+    NONE, //i sparade läget?
     OPEN,
     ACTIVE,
     WIN,

@@ -4,12 +4,15 @@ import org.springframework.data.annotation.Id;
 
 public class GameStatus {
 
-    @Id String id;
-    String name;
+    @Id String id; //game idt
 
-    Sign move;
+    String name; //kan vara null
 
-    Status game;
+    Sign move; //sten sax påse
+
+    Status game; //win or lose
+
+    //denna
 
 
 

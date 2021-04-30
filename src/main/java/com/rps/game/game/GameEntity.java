@@ -1,6 +1,5 @@
 package com.rps.game.game;
 
-import com.rps.game.user.UserEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.List;
 
-@Entity(name = "games")
+@Entity(name = "game")
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -19,9 +18,9 @@ public class GameEntity {
     @Id String id;
 
     @OneToMany(mappedBy = "game")
-    List<UserEntity> users;
+    List<GameUserEntity> users;
 
-    public void addUser(UserEntity userEntity) {
-        users.add(userEntity);
+    public void addUser(GameUserEntity gameUserEntity) {
+        users.add(gameUserEntity);
     }
 }
