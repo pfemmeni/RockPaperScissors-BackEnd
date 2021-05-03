@@ -2,8 +2,8 @@
 package com.rps.game.game;
 
 
-import com.rps.game.token.TokenNotFoundException;
-import com.rps.game.token.TokenService;
+import com.rps.game.token.*;
+import com.rps.game.tokenGame.TokenGameRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,21 +19,18 @@ public class GameController {
 
     GameService gameService;
     TokenService tokenService;
+    TokenRepository tokenRepository;
     GameRepository gameRepository;
-
+    TokenGameRepository tokenGameRepository;
 
     @GetMapping("/start")
     public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) {
-        return toGameStatus(gameService.startGame(tokenId));
+        return toGameStatus(gameService.startGame(tokenId), tokenId);
     }
-
-    private GameStatus toGameStatus(GameEntity startGame) {
-    }
-
 
     @GetMapping("/join/{gameId}")
-    public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException {
-        return gameService.joinGame(gameId, tokenId);
+    public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException, TokenAllreadyJoinedToGameExeption {
+        return toGameStatus(gameService.joinGame(gameId, tokenId), tokenId);
     }
 
     @GetMapping("/status")
@@ -67,10 +64,28 @@ public class GameController {
     }
 
     private Game toGame(GameEntity gameEntity) {
-        return new Game(UUID.randomUUID().toString()
+        return new Game(gameEntity.getId()
         );
 
     }
+    private GameStatus toGameStatus(GameEntity game, String tokenId) {
+        TokenEntity player = tokenGameRepository.findAll().stream()
+                .filter(tokenGameEntity -> tokenGameEntity.getGame().equals(game))
+                .filter(tokenGameEntity -> tokenGameEntity.getToken().getId().equals(tokenId)).findAny().get().getToken();
 
+        TokenEntity opponent = tokenGameRepository.findAll().stream()
+                .filter(tokenGameEntity -> tokenGameEntity.getGame().equals(game))
+                .filter(tokenGameEntity -> !tokenGameEntity.getToken().getId().equals(tokenId)).findAny().get().getToken();
+
+        return new GameStatus(
+                game.getId(),
+                player.getName(),
+                game.getMove().toString(),
+                game.getGame().toString(),
+                opponent.getName(),
+                game.getOpponentMove().toString()
+
+        );
+    }
 
 }
