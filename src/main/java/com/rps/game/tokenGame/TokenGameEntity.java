@@ -30,5 +30,4 @@ public class TokenGameEntity {
 
     String type; //joiner eller owner
 
-
 }

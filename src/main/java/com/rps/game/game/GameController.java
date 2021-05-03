@@ -2,13 +2,12 @@
 package com.rps.game.game;
 
 
-import com.rps.game.repository.UserRepository;
+import com.rps.game.token.TokenNotFoundException;
 import com.rps.game.token.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,6 @@ public class GameController {
 
     GameService gameService;
     TokenService tokenService;
-    UserRepository userRepository;
     GameRepository gameRepository;
 
 
@@ -31,8 +29,8 @@ public class GameController {
 
 
     @GetMapping("/join/{gameId}")
-    public Optional<GameEntity> joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) {
-        return gameRepository.findById(gameId);
+    public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException {
+        return gameService.joinGame(gameId, tokenId);
     }
 
     @GetMapping("/status")
