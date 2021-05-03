@@ -2,6 +2,7 @@ package com.rps.game.game;
 
 import com.rps.game.game.*;
 import com.rps.game.game.GameRepository;
+import com.rps.game.token.TokenEntity;
 import com.rps.game.token.TokenNotFoundException;
 import com.rps.game.tokenGame.TokenGameEntity;
 import com.rps.game.tokenGame.TokenGameRepository;
@@ -26,8 +27,8 @@ public class GameService {
         this.tokenGameRepository = tokenGameRepository;
     }
 
-    public GameStatus startGame(String tokenId) {
-        GameEntity game = createGame();
+    public GameEntity startGame(String tokenId) {
+        GameEntity game = createGame(tokenId);
 
         TokenGameEntity tokenGame = new TokenGameEntity(
                 UUID.randomUUID().toString(),
@@ -40,18 +41,12 @@ public class GameService {
         game.addToken(tokenGame);
         tokenRepository.getOne(tokenId).addGame(tokenGame);
 
-        GameStatus gameStatus = new GameStatus(
-                game.getId(),
-                tokenRepository.getOne(tokenId).getName(),
-                null,
-                Status.OPEN,
-                null,
-                null);
-        return gameStatus;
+
+        return game;
     }
 
-    private GameEntity createGame() {
-        GameEntity game = new GameEntity(UUID.randomUUID().toString(),
+    private GameEntity createGame(String tokenId) {
+        GameEntity game = new GameEntity(UUID.randomUUID().toString(), null, Status.OPEN, null,
                 new ArrayList<>());
         gameRepository.save(game);
         return game;
@@ -67,37 +62,22 @@ public class GameService {
         return gameRepository.findAll().stream();
     }
 
-    public GameStatus joinGame(String gameId, String tokenId) throws TokenNotFoundException {
-        TokenGameEntity tokenGameToJoin = tokenGameRepository
-                .findAll()
-                .stream()
-                .filter(tokenGameEntity -> tokenGameEntity
-                        .getGame()
-                        .getId()
-                        .equals(gameId) &&
-                        !tokenGameEntity
-                                .getToken()
-                                .getId().equals(tokenId))
-                .findAny()
-                .orElseThrow(TokenNotFoundException::new);
+    public GameEntity joinGame(String gameId, String tokenId) throws TokenNotFoundException, TokenAllreadyJoinedToGameExeption {
+        GameEntity gameToJoin = gameRepository.getOne(gameId);
+        TokenEntity joinerToken = tokenRepository.getOne(tokenId);
+
+        if (gameToJoin.getTokens().stream().anyMatch(tokenGameEntity -> tokenGameEntity.getToken().equals(joinerToken)))
+            throw new TokenAllreadyJoinedToGameExeption();
 
         TokenGameEntity tokenGame = new TokenGameEntity(
                 UUID.randomUUID().toString(),
-                tokenRepository.getOne(tokenId),
-                gameRepository.getOne(gameId),
+                joinerToken,
+                gameToJoin,
                 "Joiner"
         );
+        gameToJoin.addToken(tokenGame);
+        joinerToken.addGame(tokenGame);
         tokenGameRepository.save(tokenGame);
-        gameRepository.getOne(gameId).addToken(tokenGame);
-        tokenRepository.getOne(tokenId).addGame(tokenGame);
-
-        GameStatus gameStatus = new GameStatus(
-                gameRepository.getOne(gameId).getId(),
-                tokenRepository.getOne(tokenId).getName(),
-                null,
-                Status.ACTIVE,
-                tokenGameToJoin.getToken().getName(),
-                null);
-        return gameStatus;
+        return gameToJoin;
     }
 }

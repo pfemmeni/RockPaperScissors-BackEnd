@@ -22,9 +22,12 @@ public class GameController {
     GameRepository gameRepository;
 
 
-    @GetMapping("/start")//
+    @GetMapping("/start")
     public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) {
-        return gameService.startGame(tokenId);
+        return toGameStatus(gameService.startGame(tokenId));
+    }
+
+    private GameStatus toGameStatus(GameEntity startGame) {
     }
 
 
@@ -66,6 +69,7 @@ public class GameController {
     private Game toGame(GameEntity gameEntity) {
         return new Game(UUID.randomUUID().toString()
         );
+
     }
 
 

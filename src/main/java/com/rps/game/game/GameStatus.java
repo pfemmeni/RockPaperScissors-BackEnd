@@ -4,23 +4,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 
 public class GameStatus {
-
-    @Id
     String id;
     String name;
-    Sign move;
-    Status game;
+    String move;
+    String game;
     String opponentName;
-    Sign opponentMove;
+    String opponentMove;
 
     @JsonCreator
     public GameStatus(
-            @JsonProperty("id") String id,
-            @JsonProperty("name") String name,
-            @JsonProperty("move") Sign move,
-            @JsonProperty("game") Status game,
+            @JsonProperty("id") String id,//ge
+            @JsonProperty("name") String name,//tok
+            @JsonProperty("move") String move,//ge
+            @JsonProperty("game") String game,//ge
             @JsonProperty("opponentName") String opponentName,
-            @JsonProperty("opponentMove") Sign opponentMove) {
+            @JsonProperty("opponentMove") String opponentMove) {
         this.id = id;
         this.name = name;
         this.move = move;

@@ -17,6 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 public class GameEntity {
     @Id String id;
+    Sign move;
+    Status game;
+    Sign opponentMove;
 
     @OneToMany(mappedBy = "game")
     List<TokenGameEntity> tokens;
@@ -25,5 +28,5 @@ public class GameEntity {
         tokens.add(tokenGameEntity);
     }
 
-    //bajs
+
 }
