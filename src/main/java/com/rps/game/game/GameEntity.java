@@ -1,5 +1,6 @@
 package com.rps.game.game;
 
+import com.rps.game.tokenGame.TokenGameEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,10 +19,10 @@ public class GameEntity {
     @Id String id;
 
     @OneToMany(mappedBy = "game")
-    List<GameUserEntity> users;
+    List<TokenGameEntity> tokens;
 
-    public void addUser(GameUserEntity gameUserEntity) {
-        users.add(gameUserEntity);
+    public void addToken(TokenGameEntity tokenGameEntity) {
+        tokens.add(tokenGameEntity);
     }
 
     //bajs

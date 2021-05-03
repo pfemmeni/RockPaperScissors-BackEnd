@@ -1,11 +1,8 @@
 package com.rps.game.controller;
 
-import com.rps.game.service.TokenService;
-import com.rps.game.service.UserService;
-import com.rps.game.user.SetName;
-import com.rps.game.user.User;
-import com.rps.game.user.UserEntity;
-import com.rps.game.user.UserNotFoundException;
+import com.rps.game.token.TokenService;
+import com.rps.game.token.SetName;
+import com.rps.game.token.TokenNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +18,7 @@ public class UserController {
 
     @PostMapping("/name")
     public User setName(@RequestBody SetName setName,
-                        @RequestHeader(value = "token", required = true) String tokenId) throws UserNotFoundException {
+                        @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException {
         return toUser(userService.setName(setName, tokenId));
     }
 

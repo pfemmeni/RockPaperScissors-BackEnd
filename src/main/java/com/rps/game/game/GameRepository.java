@@ -1,4 +1,4 @@
-package com.rps.game.repository;
+package com.rps.game.game;
 
 import com.rps.game.game.GameEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

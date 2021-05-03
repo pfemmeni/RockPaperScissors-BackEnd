@@ -1,6 +1,6 @@
-package com.rps.game.game;
+package com.rps.game.controller;
 
-import com.rps.game.user.UserEntity;
+import com.rps.game.game.GameEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

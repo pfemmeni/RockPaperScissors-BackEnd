@@ -1,12 +1,9 @@
 
-package com.rps.game.controller;
+package com.rps.game.game;
 
 
-import com.rps.game.game.*;
-import com.rps.game.repository.GameRepository;
 import com.rps.game.repository.UserRepository;
-import com.rps.game.service.GameService;
-import com.rps.game.service.TokenService;
+import com.rps.game.token.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +26,7 @@ public class GameController {
 
     @GetMapping("/start")//
     public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) {
-        //return gameService.createNewGame(tokenId);
-
-        return null;
+        return gameService.startGame(tokenId);
     }
 
 

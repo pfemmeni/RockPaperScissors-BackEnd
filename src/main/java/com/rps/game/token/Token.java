@@ -1,19 +1,21 @@
 package com.rps.game.token;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-import java.util.UUID;
+@Builder(toBuilder = true)
+@Value
+public class Token {  String id;
+    String name;
 
+    @JsonCreator
+    public Token(
+            @JsonProperty("id") String id,
+            @JsonProperty("name") String name) {
 
-@Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Token {
-    public static Token create() {
-        return new Token(UUID.randomUUID().toString());
+        this.id = id;
+        this.name = name;
     }
 
-    String id;
 }
