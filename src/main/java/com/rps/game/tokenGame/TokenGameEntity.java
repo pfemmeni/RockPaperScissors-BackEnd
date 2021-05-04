@@ -17,7 +17,8 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TokenGameEntity {
-
+    public static final String TYPE_OWNER = "Owner";
+    public static final String TYPE_JOINER = "Joiner";
     @Id String id;
 
     @ManyToOne

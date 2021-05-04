@@ -25,12 +25,12 @@ public class GameController {
 
     @GetMapping("/start")
     public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) {
-        return toGameStatus(gameService.startGame(tokenId), tokenId);
+        return toGameStatus(gameService.startGame(tokenId), tokenRepository.getOne(tokenId));
     }
 
     @GetMapping("/join/{gameId}")
     public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException, TokenAllreadyJoinedToGameExeption {
-        return toGameStatus(gameService.joinGame(gameId, tokenId), tokenId);
+        return toGameStatus(gameService.joinGame(gameId, tokenId),tokenRepository.getOne(tokenId));
     }
 
     @GetMapping("/status")
@@ -71,36 +71,33 @@ public class GameController {
 
     }
 
-    private GameStatus toGameStatus(GameEntity game, String tokenId) {
-        String playerName = game.getTokens().stream()
-                .filter(tokenGameEntity -> tokenGameEntity
-                        .getToken()
-                        .getId()
-                        .equals(tokenId))
-                .map(tokenGameEntity -> tokenGameEntity.getToken()
-                        .getName())
-                .findAny()
-                .get();
+    private GameStatus toGameStatus(GameEntity game, TokenEntity token) {//token entity
+        if (game.isOwner(token)) {
+            return new GameStatus(
+                    game.getId(),
+                    token.getName(),
+                    game.move().map(Enum::name).orElse(""),
+                    game.getGame().name(),
+                    game.getOpponentName(),
+                    game.opponentMove().map(Enum::name).orElse("")
 
-        String opponentName = game.getTokens().stream()
-                .filter(tokenGameEntity -> !tokenGameEntity
-                        .getToken()
-                        .getId()
-                        .equals(tokenId))
-                .map(tokenGameEntity -> tokenGameEntity.getToken()
-                        .getName())
-                .findAny()
-                .get();
+            );
+        }
 
         return new GameStatus(
                 game.getId(),
-                playerName,
-                game.getMove().toString(),
-                game.getGame().toString(),
-                opponentName,
-                game.getOpponentMove().toString()
-
+                token.getName(),
+                game.opponentMove().map(Enum::name).orElse(""),
+                joinerView(game.getGame()).name(),
+                game.getOwnerName(),
+                game.move().map(Enum::name).orElse("")
         );
     }
-
+    private Status joinerView(Status status){
+        switch (status){
+            case WIN: return Status.LOSE;
+            case LOSE: return Status.WIN;
+            default: return status;
+        }
+    }
 }
