@@ -25,7 +25,9 @@ public class GameController {
 
     @GetMapping("/start")
     public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) {
-        return toGameStatus(gameService.startGame(tokenId), tokenRepository.getOne(tokenId));
+        GameEntity game = gameService.startGame(tokenId);
+        TokenEntity one = tokenRepository.getOne(tokenId);
+        return toGameStatus(game, one);
     }
 
     @GetMapping("/join/{gameId}")
