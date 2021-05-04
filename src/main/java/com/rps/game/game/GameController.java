@@ -64,25 +64,40 @@ public class GameController {
     }
 
     private Game toGame(GameEntity gameEntity) {
-        return new Game(gameEntity.getId()
+        return new Game(
+                //gameEntity.getId()
+                UUID.randomUUID().toString()
         );
 
     }
-    private GameStatus toGameStatus(GameEntity game, String tokenId) {
-        TokenEntity player = tokenGameRepository.findAll().stream()
-                .filter(tokenGameEntity -> tokenGameEntity.getGame().equals(game))
-                .filter(tokenGameEntity -> tokenGameEntity.getToken().getId().equals(tokenId)).findAny().get().getToken();
 
-        TokenEntity opponent = tokenGameRepository.findAll().stream()
-                .filter(tokenGameEntity -> tokenGameEntity.getGame().equals(game))
-                .filter(tokenGameEntity -> !tokenGameEntity.getToken().getId().equals(tokenId)).findAny().get().getToken();
+    private GameStatus toGameStatus(GameEntity game, String tokenId) {
+        String playerName = game.getTokens().stream()
+                .filter(tokenGameEntity -> tokenGameEntity
+                        .getToken()
+                        .getId()
+                        .equals(tokenId))
+                .map(tokenGameEntity -> tokenGameEntity.getToken()
+                        .getName())
+                .findAny()
+                .get();
+
+        String opponentName = game.getTokens().stream()
+                .filter(tokenGameEntity -> !tokenGameEntity
+                        .getToken()
+                        .getId()
+                        .equals(tokenId))
+                .map(tokenGameEntity -> tokenGameEntity.getToken()
+                        .getName())
+                .findAny()
+                .get();
 
         return new GameStatus(
                 game.getId(),
-                player.getName(),
+                playerName,
                 game.getMove().toString(),
                 game.getGame().toString(),
-                opponent.getName(),
+                opponentName,
                 game.getOpponentMove().toString()
 
         );
