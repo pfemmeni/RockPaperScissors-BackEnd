@@ -8,7 +8,7 @@ import java.util.Map;
 @Service
 public class TokenService {
     TokenRepository tokenRepository;
-    Map<String, Token> tokens = new HashMap<>();
+//    Map<String, Token> tokens = new HashMap<>();
 
     public TokenService(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
@@ -21,16 +21,20 @@ public class TokenService {
     }
 
     public TokenEntity setName(SetName setName, String id) throws TokenNotFoundException {
-        return tokenRepository.findById(id)
+        TokenEntity tokenToSetName = tokenRepository.findById(id)
                 .map(tokenEntity -> {
                     if (setName.getName() != null)
                         tokenEntity.setName(setName.getName());
                     return tokenEntity;
                 })
                 .orElseThrow(TokenNotFoundException::new);
+        tokenRepository.save(tokenToSetName);
+        return tokenToSetName;
     }
 
-    public Token getTokenById(String tokenId) {
-        return tokens.get(tokenId);
-    }
+//    public Token getTokenById(String tokenId) {
+//        return tokens.get(tokenId);
+//    }
+
 }
+

@@ -3,6 +3,7 @@ package com.rps.game.game;
 
 
 import com.rps.game.token.*;
+import com.rps.game.tokenGame.TokenGameEntity;
 import com.rps.game.tokenGame.TokenGameRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,29 +32,35 @@ public class GameController {
     }
 
     @GetMapping("/join/{gameId}")
-    public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException, TokenAllreadyJoinedToGameExeption {
-        return toGameStatus(gameService.joinGame(gameId, tokenId),tokenRepository.getOne(tokenId));
+    public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId)
+            throws TokenAlreadyJoinedToGameException, GameAlreadyStartedException {
+        return toGameStatus(gameService.joinGame(gameId, tokenId), tokenRepository.getOne(tokenId));
     }
 
-    @GetMapping("/status")
-    public Game statusGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId) {
-        return null;
-    }
-
-    @GetMapping()
-    public List<Game> listOfAllJoinableGames(@RequestHeader(value = "token", required = false) String tokenId) {
+    @GetMapping()// /games
+    public List<GameStatus> listOfAllJoinableGames(@RequestHeader(value = "token", required = false) String tokenId) {
         return gameService.all()
-                .map(this::toGame)
+                .map(gameEntity -> toGameStatus(gameEntity,
+                        getOwner(gameEntity)))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/[id]")
-    public Game getGameStatus(@PathVariable String id, @RequestHeader(value = "token", required = true) String tokenId) {
+    @GetMapping("/status")
+    public Game statusGame(@RequestHeader(value = "token", required = true) String tokenId) {
         return null;
     }
 
-    @GetMapping("/move/[sign]")
-    public Game makeMove(@PathVariable Sign sign, String gameId, @RequestHeader(value = "token", required = true) String tokenId) {
+
+
+    @GetMapping("/{id}")
+    public GameStatus getGameStatus(@PathVariable String id, @RequestHeader(value = "token", required = false) String tokenId) {
+        GameEntity game = gameRepository.getOne(id);
+        return toGameStatus(game, getOwner(game));
+    }
+
+    @GetMapping("/move/{sign}")
+    public GameStatus makeMove(@PathVariable Sign sign, String gameId, @RequestHeader(value = "token", required = true) String tokenId) {
+        return toGameStatus(gameService.makeMove(sign, gameId, tokenId), tokenRepository.getOne(tokenId));
 /*
          switch (sign) {
              case ROCK -> null;
@@ -61,16 +68,16 @@ public class GameController {
              case SCISSORS -> null;
          }
 */
-
-        return null;
     }
 
-    private Game toGame(GameEntity gameEntity) {
-        return new Game(
-                //gameEntity.getId()
-                UUID.randomUUID().toString()
-        );
-
+    private TokenEntity getOwner(GameEntity gameEntity) {
+        return gameEntity.getTokens().stream()
+                .filter(tokenGameEntity ->
+                        tokenGameEntity.getType()
+                                .equals(TokenGameEntity.TYPE_OWNER))
+                .findFirst()
+                .get()
+                .getToken();
     }
 
     private GameStatus toGameStatus(GameEntity game, TokenEntity token) {//token entity
@@ -82,10 +89,8 @@ public class GameController {
                     game.getGame().name(),
                     game.getOpponentName(),
                     game.opponentMove().map(Enum::name).orElse("")
-
             );
         }
-
         return new GameStatus(
                 game.getId(),
                 token.getName(),
@@ -95,11 +100,24 @@ public class GameController {
                 game.move().map(Enum::name).orElse("")
         );
     }
-    private Status joinerView(Status status){
-        switch (status){
-            case WIN: return Status.LOSE;
-            case LOSE: return Status.WIN;
-            default: return status;
+
+    private Status joinerView(Status status) {
+        switch (status) {
+            case WIN:
+                return Status.LOSE;
+            case LOSE:
+                return Status.WIN;
+            default:
+                return status;
         }
     }
+
+//    private Game toGame(GameEntity gameEntity) {
+//        return new Game(
+//                //gameEntity.getId()
+//                UUID.randomUUID().toString()
+//        );
+//
+//    }
+
 }

@@ -15,6 +15,7 @@ public class TokenController {
     public String createNewToken() {
         return tokenService.createToken().getId();
     }
+
     @PostMapping("user/name")
     public Token setName(@RequestBody SetName setName,
                         @RequestHeader(value = "token", required = true) String tokenId) throws TokenNotFoundException {
