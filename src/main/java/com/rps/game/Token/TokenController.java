@@ -24,7 +24,6 @@ public class TokenController {
     }
 
     public Token toToken(TokenEntity tokenEntity){
-        Token token = new Token(tokenEntity.getId(),tokenEntity.getName());
-        return token;
+        return new Token(tokenEntity.getId(),tokenEntity.getName());
     }
 }
