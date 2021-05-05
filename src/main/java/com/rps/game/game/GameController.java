@@ -59,7 +59,7 @@ public class GameController {
     }
 
     @GetMapping("/move/{sign}")
-    public GameStatus makeMove(@PathVariable Sign sign, String gameId, @RequestHeader(value = "token", required = true) String tokenId) {
+    public GameStatus makeMove(@PathVariable Sign sign, @RequestHeader(value = "token", required = true) String tokenId, String gameId ) {
         return toGameStatus(gameService.makeMove(sign, gameId, tokenId), tokenRepository.getOne(tokenId));
 /*
          switch (sign) {
