@@ -1,10 +1,12 @@
 
-package com.rps.game.game;
+package com.rps.game.Game;
 
 
-import com.rps.game.token.*;
-import com.rps.game.tokenGame.TokenGameEntity;
-import com.rps.game.tokenGame.TokenGameRepository;
+import com.rps.game.Exceptions.GameAlreadyStartedException;
+import com.rps.game.Exceptions.TokenAlreadyJoinedToGameException;
+import com.rps.game.Token.*;
+import com.rps.game.TokenGame.TokenGameEntity;
+import com.rps.game.TokenGame.TokenGameRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

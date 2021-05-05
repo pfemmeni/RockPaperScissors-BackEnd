@@ -1,4 +1,4 @@
-package com.rps.game.token;
+package com.rps.game.Token;
 
 import lombok.Data;
 

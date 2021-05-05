@@ -1,4 +1,4 @@
-package com.rps.game.token;
+package com.rps.game.Token;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

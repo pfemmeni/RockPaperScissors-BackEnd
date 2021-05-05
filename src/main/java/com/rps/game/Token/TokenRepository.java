@@ -1,4 +1,4 @@
-package com.rps.game.token;
+package com.rps.game.Token;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

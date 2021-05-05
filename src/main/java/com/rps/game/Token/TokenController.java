@@ -1,5 +1,6 @@
-package com.rps.game.token;
+package com.rps.game.Token;
 
+import com.rps.game.Exceptions.TokenNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

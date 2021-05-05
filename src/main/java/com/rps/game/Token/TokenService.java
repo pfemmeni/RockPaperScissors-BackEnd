@@ -1,9 +1,7 @@
-package com.rps.game.token;
+package com.rps.game.Token;
 
+import com.rps.game.Exceptions.TokenNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class TokenService {

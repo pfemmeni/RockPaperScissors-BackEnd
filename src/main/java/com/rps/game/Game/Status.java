@@ -1,4 +1,4 @@
-package com.rps.game.game;
+package com.rps.game.Game;
 
 
 public enum Status {

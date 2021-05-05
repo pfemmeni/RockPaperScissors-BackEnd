@@ -1,8 +1,8 @@
 package com.rps.game;
 
-import com.rps.game.game.GameController;
-import com.rps.game.game.GameStatus;
-import com.rps.game.token.TokenController;
+import com.rps.game.Game.GameController;
+import com.rps.game.Game.GameStatus;
+import com.rps.game.Token.TokenController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

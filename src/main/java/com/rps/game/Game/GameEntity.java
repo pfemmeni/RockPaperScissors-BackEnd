@@ -1,7 +1,7 @@
-package com.rps.game.game;
+package com.rps.game.Game;
 
-import com.rps.game.token.TokenEntity;
-import com.rps.game.tokenGame.TokenGameEntity;
+import com.rps.game.Token.TokenEntity;
+import com.rps.game.TokenGame.TokenGameEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

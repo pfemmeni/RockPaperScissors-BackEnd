@@ -1,4 +1,4 @@
-package com.rps.game.token;
+package com.rps.game.Exceptions;
 
 public class TokenNotFoundException extends Exception{
 }
