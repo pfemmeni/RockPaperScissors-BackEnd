@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -32,42 +31,28 @@ public class GameController {
     }
 
     @GetMapping("/join/{gameId}")
-    public GameStatus joinGame(@PathVariable String gameId, @RequestHeader(value = "token", required = true) String tokenId)
+    public GameStatus joinGame( @RequestHeader(value = "token", required = true) String tokenId, @PathVariable String gameId)
             throws TokenAlreadyJoinedToGameException, GameAlreadyStartedException {
         return toGameStatus(gameService.joinGame(gameId, tokenId), tokenRepository.getOne(tokenId));
     }
 
-    @GetMapping()// /games
+    @GetMapping()
     public List<GameStatus> listOfAllJoinableGames(@RequestHeader(value = "token", required = false) String tokenId) {
-        return gameService.all()
+        return gameService.allOpenGames()
                 .map(gameEntity -> toGameStatus(gameEntity,
                         getOwner(gameEntity)))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/status")
-    public Game statusGame(@RequestHeader(value = "token", required = true) String tokenId) {
-        return null;
-    }
-
-
-
     @GetMapping("/{id}")
-    public GameStatus getGameStatus(@PathVariable String id, @RequestHeader(value = "token", required = false) String tokenId) {
+    public GameStatus getGameStatus(@RequestHeader(value = "token", required = false) String tokenId, @PathVariable String id) {
         GameEntity game = gameRepository.getOne(id);
-        return toGameStatus(game, getOwner(game));
+        return toGameStatus(game, tokenId == null ? getOwner(game) : tokenRepository.getOne(tokenId));
     }
 
     @GetMapping("/move/{sign}")
-    public GameStatus makeMove(@PathVariable Sign sign, @RequestHeader(value = "token", required = true) String tokenId, String gameId ) {
+    public GameStatus makeMove(@PathVariable Sign sign, @RequestHeader(value = "token", required = true) String tokenId, String gameId) {
         return toGameStatus(gameService.makeMove(sign, gameId, tokenId), tokenRepository.getOne(tokenId));
-/*
-         switch (sign) {
-             case ROCK -> null;
-             case PAPER -> null;
-             case SCISSORS -> null;
-         }
-*/
     }
 
     private TokenEntity getOwner(GameEntity gameEntity) {
@@ -111,13 +96,5 @@ public class GameController {
                 return status;
         }
     }
-
-//    private Game toGame(GameEntity gameEntity) {
-//        return new Game(
-//                //gameEntity.getId()
-//                UUID.randomUUID().toString()
-//        );
-//
-//    }
 
 }

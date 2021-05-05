@@ -58,15 +58,6 @@ public class GameService {
         return gameToJoin;
     }
 
-    private TokenGameEntity createNewTokenGameEntity(GameEntity game, TokenEntity token, String type) {
-        return new TokenGameEntity(
-                UUID.randomUUID().toString(),
-                token,
-                game,
-                type
-        );
-    }
-
     private void checkIfTokenCanJoinGame(GameEntity gameToJoin, TokenEntity joinerToken)
             throws TokenAlreadyJoinedToGameException, GameAlreadyStartedException {
         if (gameToJoin.getTokens().stream()
@@ -79,17 +70,39 @@ public class GameService {
         }
     }
 
+    private TokenGameEntity createNewTokenGameEntity(GameEntity game, TokenEntity token, String type) {
+        return new TokenGameEntity(
+                UUID.randomUUID().toString(),
+                token,
+                game,
+                type
+        );
+    }
 
-    public Stream<GameEntity> all() {
+
+    public Stream<GameEntity> allOpenGames() {
         return gameRepository.findAll().stream().filter(gameEntity -> gameEntity.getGame().equals(Status.OPEN));
     }
+
 
     public GameEntity makeMove(Sign sign, String gameId, String tokenId) {
         GameEntity game = gameRepository.getOne(gameId);
         TokenEntity token = tokenRepository.getOne(tokenId);
 
+        gameResultCalculation(sign, game, token);
 
+        String type = getType(sign, game, token);
 
+        TokenGameEntity tokenGameEntity = getNewTokenGameEntity(game, token, type);
+
+        gameRepository.save(game);
+        game.addToken(tokenGameEntity);
+        token.addGame(tokenGameEntity);
+        tokenGameRepository.save(getNewTokenGameEntity(game, token, type));
+        return game;
+    }
+
+    private String getType(Sign sign, GameEntity game, TokenEntity token) {
         String type;
         if (game.isOwner(token)) {
             type = TokenGameEntity.TYPE_OWNER;
@@ -98,14 +111,54 @@ public class GameService {
             type = TokenGameEntity.TYPE_JOINER;
             game.setOpponentMove(sign);
         }
-
-        TokenGameEntity tokenGameEntity = getNewTokenGameEntity(game, token, type);
-        gameRepository.save(game);
-        game.addToken(tokenGameEntity);
-        token.addGame(tokenGameEntity);
-        tokenGameRepository.save(getNewTokenGameEntity(game, token, type));
-        return game;
+        return type;
     }
+
+    private void gameResultCalculation(Sign sign, GameEntity game, TokenEntity token) {
+        if (checkIfAllPlayersMadeMove(game.getId())) {
+            if (game.isOwner(token)) {
+                game.setGame(gameResult(sign, game.getOpponentMove()));
+            } else {
+                game.setGame(gameResult(sign, game.getMove()));
+            }
+        }
+    }
+
+    private boolean checkIfAllPlayersMadeMove(String gameId) {
+        GameEntity game = gameRepository.getOne(gameId);
+        return game.getMove() != null || game.getOpponentMove() != null;
+    }
+
+    private Status gameResult(Sign sign, Sign opponentSign) {
+        switch (sign) {
+            case ROCK: {
+                if (opponentSign.equals(Sign.ROCK))
+                    return Status.DRAW;
+                if (opponentSign.equals(Sign.PAPER))
+                    return Status.LOSE;
+                if (opponentSign.equals(Sign.SCISSORS))
+                    return Status.WIN;
+            }
+            case PAPER: {
+                if (opponentSign.equals(Sign.PAPER))
+                    return Status.DRAW;
+                if (opponentSign.equals(Sign.SCISSORS))
+                    return Status.LOSE;
+                if (opponentSign.equals(Sign.ROCK))
+                    return Status.WIN;
+            }
+            case SCISSORS: {
+                if (opponentSign.equals(Sign.SCISSORS))
+                    return Status.DRAW;
+                if (opponentSign.equals(Sign.ROCK))
+                    return Status.LOSE;
+                if (opponentSign.equals(Sign.PAPER))
+                    return Status.WIN;
+            }
+        }
+        return Status.NONE;
+    }
+
 
     private TokenGameEntity getNewTokenGameEntity(GameEntity game, TokenEntity token, String type) {
         return createNewTokenGameEntity(game, token, type);

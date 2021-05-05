@@ -57,10 +57,12 @@ public class GameEntity {
                 .orElseThrow();
         return tokenGameEntity1.getToken().getName();
     }
-    public Optional<Sign> move(){
+
+    public Optional<Sign> move() {
         return Optional.ofNullable(move);
     }
-    public Optional<Sign> opponentMove(){
+
+    public Optional<Sign> opponentMove() {
         return Optional.ofNullable(opponentMove);
     }
 }
