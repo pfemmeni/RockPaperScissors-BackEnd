@@ -95,11 +95,12 @@ public class GameService {
         TokenEntity token = tokenRepository.getOne(tokenId);
         GameEntity game = token.getGames().stream().findFirst().get().getGame();
 
+        gameResultCalculation(sign, game, token);
         String type = getType(sign, game, token);
 
         TokenGameEntity tokenGameEntity = getNewTokenGameEntity(game, token, type);
 
-        gameResultCalculation(sign, game, token);
+
 
         gameRepository.save(game);
         game.addToken(tokenGameEntity);
