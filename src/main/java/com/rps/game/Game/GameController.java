@@ -3,6 +3,7 @@ package com.rps.game.Game;
 
 
 import com.rps.game.Exceptions.GameAlreadyStartedException;
+import com.rps.game.Exceptions.OneGameAtTheTimeAllowedException;
 import com.rps.game.Exceptions.TokenAlreadyJoinedToGameException;
 import com.rps.game.Token.*;
 import com.rps.game.TokenGame.TokenGameEntity;
@@ -26,7 +27,7 @@ public class GameController {
     TokenGameRepository tokenGameRepository;
 
     @GetMapping("/start")
-    public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) {
+    public GameStatus createGame(@RequestHeader(value = "token", required = true) String tokenId) throws OneGameAtTheTimeAllowedException {
         GameEntity game = gameService.startGame(tokenId);
         TokenEntity one = tokenRepository.getOne(tokenId);
         return toGameStatus(game, one);
@@ -42,7 +43,7 @@ public class GameController {
     public List<GameStatus> listOfAllJoinableGames(@RequestHeader(value = "token", required = false) String tokenId) {
         return gameService.allOpenGames()
                 .map(gameEntity -> toGameStatus(gameEntity,
-                        getOwner(gameEntity)))
+                        tokenId == null ? getOwner(gameEntity) : tokenRepository.getOne(tokenId)))
                 .collect(Collectors.toList());
     }
 
@@ -53,8 +54,8 @@ public class GameController {
     }
 
     @GetMapping("/move/{sign}")
-    public GameStatus makeMove(@PathVariable Sign sign, @RequestHeader(value = "token", required = true) String tokenId, String gameId) {
-        return toGameStatus(gameService.makeMove(sign, gameId, tokenId), tokenRepository.getOne(tokenId));
+    public GameStatus makeMove(@PathVariable Sign sign, @RequestHeader(value = "token", required = true) String tokenId) {
+        return toGameStatus(gameService.makeMove(sign, tokenId), tokenRepository.getOne(tokenId));
     }
 
     private TokenEntity getOwner(GameEntity gameEntity) {

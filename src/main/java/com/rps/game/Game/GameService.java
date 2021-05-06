@@ -1,6 +1,7 @@
 package com.rps.game.Game;
 
 import com.rps.game.Exceptions.GameAlreadyStartedException;
+import com.rps.game.Exceptions.OneGameAtTheTimeAllowedException;
 import com.rps.game.Exceptions.TokenAlreadyJoinedToGameException;
 import com.rps.game.Token.TokenEntity;
 import com.rps.game.TokenGame.TokenGameEntity;
@@ -25,7 +26,7 @@ public class GameService {
         this.tokenGameRepository = tokenGameRepository;
     }
 
-    public GameEntity startGame(String tokenId) {
+    public GameEntity startGame(String tokenId) throws OneGameAtTheTimeAllowedException {
         GameEntity game = createGame();
         TokenEntity token = tokenRepository.getOne(tokenId);
 
@@ -33,6 +34,9 @@ public class GameService {
 
         game.setGame(Status.OPEN);
         game.addToken(tokenGame);
+        if(token.getGames().size()==1){
+            throw new OneGameAtTheTimeAllowedException();
+        }
         token.addGame(tokenGame);
         tokenGameRepository.save(tokenGame);
         return game;
@@ -87,15 +91,15 @@ public class GameService {
     }
 
 
-    public GameEntity makeMove(Sign sign, String gameId, String tokenId) {
-        GameEntity game = gameRepository.getOne(gameId);
+    public GameEntity makeMove(Sign sign,  String tokenId) {
         TokenEntity token = tokenRepository.getOne(tokenId);
-
-        gameResultCalculation(sign, game, token);
+        GameEntity game = token.getGames().stream().findFirst().get().getGame();
 
         String type = getType(sign, game, token);
 
         TokenGameEntity tokenGameEntity = getNewTokenGameEntity(game, token, type);
+
+        gameResultCalculation(sign, game, token);
 
         gameRepository.save(game);
         game.addToken(tokenGameEntity);

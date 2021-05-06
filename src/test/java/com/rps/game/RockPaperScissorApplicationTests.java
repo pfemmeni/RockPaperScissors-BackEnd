@@ -1,5 +1,6 @@
 package com.rps.game;
 
+import com.rps.game.Exceptions.OneGameAtTheTimeAllowedException;
 import com.rps.game.Game.GameController;
 import com.rps.game.Game.GameStatus;
 import com.rps.game.Token.TokenController;
@@ -29,7 +30,7 @@ class RockPaperScissorApplicationTests {
 
     @Test
     @Transactional
-    void name() {
+    void name() throws OneGameAtTheTimeAllowedException {
         // Given
         String tokenId = tokenController.createNewToken();
 
