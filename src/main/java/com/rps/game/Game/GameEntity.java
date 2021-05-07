@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -25,7 +26,7 @@ public class GameEntity {
     Status game;
     Sign opponentMove;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game" ,  cascade = CascadeType.ALL)
     List<TokenGameEntity> tokens;
 
     public void addToken(TokenGameEntity tokenGameEntity) {

@@ -27,25 +27,23 @@ public class GameService {
     }
 
     public GameEntity startGame(String tokenId) throws OneGameAtTheTimeAllowedException {
-        GameEntity game = createGame();
         TokenEntity token = tokenRepository.getOne(tokenId);
-
-        TokenGameEntity tokenGame = createNewTokenGameEntity(game, token, TokenGameEntity.TYPE_OWNER);
-
-        game.setGame(Status.OPEN);
-        game.addToken(tokenGame);
         if (token.getGames().size() == 1) {
             throw new OneGameAtTheTimeAllowedException();
         }
+        GameEntity game = createGame();
+
+        TokenGameEntity tokenGame = createNewTokenGameEntity(game, token, TokenGameEntity.TYPE_OWNER);
+
+        game.addToken(tokenGame);
         token.addGame(tokenGame);
-        tokenGameRepository.save(tokenGame);
+        gameRepository.save(game);
         return game;
     }
 
     private GameEntity createGame() {
         GameEntity game = new GameEntity(UUID.randomUUID().toString(), null, Status.OPEN, null,
                 new ArrayList<>());
-        gameRepository.save(game);
         return game;
     }
 
@@ -60,7 +58,7 @@ public class GameService {
         gameToJoin.setGame(Status.ACTIVE);
         gameToJoin.addToken(tokenGame);
         joinerToken.addGame(tokenGame);
-        tokenGameRepository.save(tokenGame);
+        gameRepository.save(gameToJoin);
         return gameToJoin;
     }
 
@@ -93,27 +91,43 @@ public class GameService {
 
     public GameEntity makeMove(Sign sign, String tokenId) {
         TokenEntity token = tokenRepository.getOne(tokenId);
-        GameEntity game = tokenGameRepository.findAll().stream().filter(tokenGameEntity -> tokenGameEntity
-                .getToken().getId().equals(tokenId)).map(tokenGameEntity -> {
-            if (tokenGameEntity.getType().equals(TokenGameEntity.TYPE_OWNER)) {
-                tokenGameEntity.getGame().setMove(sign);
+        TokenGameEntity game = token.getGames().stream() //game = tokenGame
+                .filter(tokenGameEntity -> tokenGameEntity.getToken().equals(token))
+                .findFirst().orElseThrow();//Gamenotfoundexec
+
+        if (game.getType().equals(TokenGameEntity.TYPE_OWNER)){
+            game.getGame().setMove(sign);
+
+        }else {
+            game.getGame().setOpponentMove(sign);
+
+        }
+        if (game.getGame().getMove() != null && game.getGame().getOpponentMove() != null) {
+            game.getGame().setGame(gameResult(game.getGame().getMove(), game.getGame().getOpponentMove()));
+        }
+
+       /*
+            tokenGameRepository.findAll().stream().filter(tokenGameEntity -> tokenGameEntity
+                    .getToken().getId().equals(tokenId)).map(tokenGameEntity -> {
+                if (tokenGameEntity.getType().equals(TokenGameEntity.TYPE_OWNER)) {
+                    tokenGameEntity.getGame().setMove(sign);
+                    return tokenGameEntity.getGame();
+                }
+                if (tokenGameEntity.getType().equals(TokenGameEntity.TYPE_JOINER)) {
+                    tokenGameEntity.getGame().setOpponentMove(sign);
+                    return tokenGameEntity.getGame();
+                }
                 return tokenGameEntity.getGame();
-            }
-            if (tokenGameEntity.getType().equals(TokenGameEntity.TYPE_JOINER)) {
-                tokenGameEntity.getGame().setOpponentMove(sign);
-                return tokenGameEntity.getGame();
-            }
-            return tokenGameEntity.getGame();
-        }).findAny().get();
+            }).findAny().get();
 
 
         if (game.getMove() != null && game.getOpponentMove() != null) {
             if (game.isOwner(token))
-                game.setGame( gameResult(game.getMove(), game.getOpponentMove()));
+                game.setGame(gameResult(game.getMove(), game.getOpponentMove()));
             game.setGame(gameResult(game.getOpponentMove(), game.getMove()));
         }
-
-        gameRepository.save(game);
+*/
+        gameRepository.save(game.getGame());
 
        /* String type = getType(sign, game, token);
         TokenGameEntity tokenGameEntity = getNewTokenGameEntity(game, token, type);
@@ -121,7 +135,7 @@ public class GameService {
         token.addGame(tokenGameEntity);
         tokenGameRepository.save(getNewTokenGameEntity(game, token, type));*/
 
-        return game;
+        return game.getGame();
     }
 
    /* private String getType(Sign sign, GameEntity game, TokenEntity token) {

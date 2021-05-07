@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -25,7 +26,7 @@ public class TokenEntity {
 
     @Id String id;
     String name;
-    @OneToMany(mappedBy = "token")
+    @OneToMany(mappedBy = "token", cascade = CascadeType.ALL)
     List<TokenGameEntity> games;
 
     public void addGame(TokenGameEntity tokenGameEntity) {
