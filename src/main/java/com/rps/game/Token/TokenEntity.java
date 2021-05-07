@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Entity(name = "token")
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,5 +32,13 @@ public class TokenEntity {
         games.add(tokenGameEntity);
     }
 
+    @Override
+    public String toString() {
+        return "TokenEntity{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", games=" + games.stream().map(TokenGameEntity::getType).collect(Collectors.joining()) +
+                '}';
+    }
 }
 

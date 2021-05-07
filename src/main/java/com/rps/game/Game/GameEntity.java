@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Entity(name = "game")
 @Data
@@ -28,7 +29,10 @@ public class GameEntity {
     List<TokenGameEntity> tokens;
 
     public void addToken(TokenGameEntity tokenGameEntity) {
-        tokens.add(tokenGameEntity);
+        if(getTokens().size() ==1 && tokenGameEntity.getType().equals(TokenGameEntity.TYPE_OWNER)){
+            throw new RuntimeException("Type cannot be Owner for Joiner");
+        }
+        getTokens().add(tokenGameEntity);
     }
 
     public boolean isOwner(TokenEntity token) {
@@ -64,5 +68,16 @@ public class GameEntity {
 
     public Optional<Sign> opponentMove() {
         return Optional.ofNullable(opponentMove);
+    }
+
+    @Override
+    public String toString() {
+        return "GameEntity{" +
+                "id='" + id + '\'' +
+                ", move=" + move +
+                ", game=" + game +
+                ", opponentMove=" + opponentMove +
+                ", tokens=" + tokens.stream().map(TokenGameEntity::getType).collect(Collectors.joining()) +
+                '}';
     }
 }
